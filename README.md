@@ -60,6 +60,15 @@ Run a scan over `N`:
 julia --project scripts/run_experiment.jl experiments/exp_003_scan_N/config.yaml
 ```
 
+## Leverage version (v2)
+
+Two example configs (independent leverage vs. stupid-biased leverage):
+
+```bash
+julia --project scripts/run_experiment.jl experiments/exp_004_leverage_independent/config.yaml
+julia --project scripts/run_experiment.jl experiments/exp_005_leverage_S_high/config.yaml
+```
+
 ## Visualize t vs W(t)
 
 ```bash

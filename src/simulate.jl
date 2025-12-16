@@ -7,7 +7,7 @@ struct SimulationResult
 end
 
 """
-Run the Minimal ABM (v1).
+Run the Minimal ABM (v1/v2).
 
 Each step samples an ordered pair i→j (i≠j), draws:
 - a ~ Exponential(A)
@@ -16,12 +16,15 @@ Each step samples an ordered pair i→j (i≠j), draws:
 Then updates:
 Δu_i = s_self(type_i)*a + ϵ_i
 Δu_j = s_other(type_i)*a + ϵ_j
+
+If leverage is enabled, both deltas are multiplied by (L_actor^alpha).
 """
 function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.random_seed))
     N = params.N
     T = params.T_steps
 
     types = sample_types(rng, params.p_types, N)
+    leverages = sample_leverages(rng, params.leverage, types)
     u = fill(params.u0, N)
 
     W_series = Vector{Float64}(undef, T + 1)
@@ -43,6 +46,12 @@ function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.r
         ti = types[i]
         du_i = sign_self(ti) * a + eps_i
         du_j = sign_other(ti) * a + eps_j
+
+        if params.leverage.enabled
+            f = leverages[i]^params.leverage.alpha
+            du_i *= f
+            du_j *= f
+        end
 
         u[i] += du_i
         u[j] += du_j

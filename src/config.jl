@@ -38,6 +38,28 @@ function params_from_config(cfg)::ModelParams
     u0 = _get_any(cfg, ("u0",), 0.0)
     u_threshold = _get_any(cfg, ("u_threshold",), -Inf)
 
+    # v2 leverage (optional; defaults keep v1 behavior)
+    lev_cfg = get(cfg, "leverage", nothing)
+    leverage = nothing
+    if lev_cfg !== nothing
+        enabled = Bool(get(lev_cfg, "enabled", true))
+        alpha = Float64(get(lev_cfg, "alpha", 1.0))
+        dist = Symbol(get(lev_cfg, "dist", "lognormal"))
+        lmin = Float64(get(lev_cfg, "lmin", 1.0))
+        mu = Float64(get(lev_cfg, "mu", 0.0))
+        sigmaL = Float64(get(lev_cfg, "sigma", 0.0))
+        mode = Symbol(get(lev_cfg, "mode", "independent"))
+
+        tb = default_type_bias()
+        if haskey(lev_cfg, "type_bias")
+            raw = lev_cfg["type_bias"]
+            for (k, v) in raw
+                tb[parse_agent_type(k)] = Float64(v)
+            end
+        end
+        leverage = LeverageSpec(enabled, alpha, dist, lmin, mu, sigmaL, tb, mode)
+    end
+
     return ModelParams(
         N = N,
         T_steps = T_steps,
@@ -47,6 +69,7 @@ function params_from_config(cfg)::ModelParams
         random_seed = random_seed,
         u0 = u0,
         u_threshold = u_threshold,
+        leverage = leverage,
     )
 end
 

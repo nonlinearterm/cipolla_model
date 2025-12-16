@@ -113,6 +113,22 @@ function run_single(cfg, out_dir::AbstractString; tag=nothing)
         "u0" => params.u0,
     )
 
+    if params.leverage.enabled
+        meta["leverage"] = Dict(
+            "enabled" => true,
+            "alpha" => params.leverage.alpha,
+            "dist" => String(params.leverage.dist),
+            "lmin" => params.leverage.lmin,
+            "mu" => params.leverage.mu,
+            "sigma" => params.leverage.sigma,
+            "mode" => String(params.leverage.mode),
+            "type_bias" => Dict("I"=>get(params.leverage.type_bias, I, 1.0),
+                                "B"=>get(params.leverage.type_bias, B, 1.0),
+                                "H"=>get(params.leverage.type_bias, H, 1.0),
+                                "S"=>get(params.leverage.type_bias, S, 1.0)),
+        )
+    end
+
     return Dict(
         "status" => "OK",
         "timestamp" => utc_timestamp(),
