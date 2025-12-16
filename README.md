@@ -79,6 +79,6 @@ This saves `scan_plot.png` next to each input CSV (by default).
 
 ## Results summary
 
-See `RESULTS.md` for the current v1 findings and how to reproduce.
+See `analysis/RESULTS_minimal-v1.md` for the current v1 findings and how to reproduce.
 
 
