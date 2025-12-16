@@ -44,7 +44,8 @@ function main()
     end
 
     p = plot(; xlabel="p_S", ylabel="m_W_mean", title="p_S vs m_W_mean (curves for gammas with collapse_prob>0)")
-    hline!(p, [0.0]; linestyle=:dash, color=:black, linewidth=1)
+    hline!(p, [0.0]; linestyle=:dash, color=:black, linewidth=1, label=false)
+    xlims!(p, (minimum(pS), maximum(pS)))
 
     for g in interesting
         idx = findall(==(g), gam)
