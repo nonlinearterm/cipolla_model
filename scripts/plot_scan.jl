@@ -18,6 +18,13 @@ function asfloat(x)
     return Float64(x)
 end
 
+function infer_label(path::AbstractString)
+    lp = lowercase(path)
+    occursin("levind", lp) && return "levInd"
+    occursin("levs", lp) && return "levS"
+    return nothing
+end
+
 function main()
     if length(ARGS) < 1
         usage()
@@ -26,6 +33,7 @@ function main()
 
     in_csv = abspath(ARGS[1])
     out_png = (length(ARGS) >= 2) ? abspath(ARGS[2]) : joinpath(dirname(in_csv), "scan_plot.png")
+    label = infer_label(in_csv)
 
     data = readdlm(in_csv, ',', Any)
     size(data, 1) >= 2 || error("CSV must have header + at least one data row: $in_csv")
@@ -55,13 +63,15 @@ function main()
         mean_u_std = nothing
     end
 
+    title_suffix = isnothing(label) ? "" : " ($(label))"
+
     p1 = plot(
         x, mW;
         marker = :circle,
         linewidth = 2,
         xlabel = param_name,
         ylabel = "m_W",
-        title = "Order parameter: m_W vs $param_name",
+        title = "Order parameter: m_W vs $param_name$title_suffix",
         legend = false,
     )
     hline!(p1, [0.0]; linestyle=:dash, linewidth=1, color=:black)
@@ -76,7 +86,7 @@ function main()
         linewidth = 2,
         xlabel = param_name,
         ylabel = "final_mean_u",
-        title = "Aux: final_mean_u vs $param_name",
+        title = "Aux: final_mean_u vs $param_name$title_suffix",
         legend = false,
     )
     hline!(p2, [0.0]; linestyle=:dash, linewidth=1, color=:black)
@@ -112,6 +122,11 @@ function main()
                 end
             end
         end
+    end
+
+    if !isnothing(label)
+        annotate!(p1, (0.02, 0.96), text("label: $(label)", 10, :left, :black))
+        annotate!(p2, (0.02, 0.96), text("label: $(label)", 10, :left, :black))
     end
 
     p = plot(p1, p2; layout=(2,1), size=(900,700))
