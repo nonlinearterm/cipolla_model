@@ -1,0 +1,46 @@
+model: leverage_abm_v4_absorbing
+model_version: "leverage-v4"
+git_commit: "UNKNOWN"
+
+T_steps: 20000
+N: 5000  # fixed
+
+A: 1.0
+sigma: 0.1
+u0: 0.0
+u_threshold: -10.0
+bankruptcy_threshold: -50.0
+
+leverage:
+  enabled: true
+  alpha: 1.0
+  gamma: 2.0
+  dist: lognormal
+  lmin: 1.0
+  mu: 0.0
+  sigma: 0.7
+  mode: type_biased
+  type_bias:
+    I: 1.0
+    B: 1.0
+    H: 1.0
+    S: 3.0
+
+p_types_base:
+  I: 0.33
+  B: 0.33
+  H: 0.34
+
+grid:
+  N:
+    values: [5000]
+  p_S:
+    linspace:
+      start: 0.0
+      stop: 0.5
+      num: 101
+  replicates: 1
+
+random_seed: 92345
+
+

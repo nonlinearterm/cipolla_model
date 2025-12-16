@@ -41,6 +41,7 @@ function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.r
     active = trues(N)
     active_idx = collect(1:N)
     active_count = N
+    active_pos = collect(1:N)  # active_pos[i] = position of i in active_idx, undefined if inactive
 
     # v3: actor sampling ∝ L^gamma among ACTIVE agents (rebuild alias when active set changes)
     function rebuild_actor_tab()
@@ -60,12 +61,13 @@ function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.r
             return false
         end
         active[k] = false
-        # remove from active_idx by swap-remove
-        pos = findfirst(==(k), active_idx)
-        if pos !== nothing
-            active_idx[pos] = active_idx[end]
-            pop!(active_idx)
-        end
+        # remove from active_idx by swap-remove in O(1)
+        pos = active_pos[k]
+        last = active_idx[end]
+        active_idx[pos] = last
+        active_pos[last] = pos
+        pop!(active_idx)
+        active_pos[k] = 0
         active_count -= 1
         return true
     end
@@ -96,8 +98,7 @@ function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.r
         # sample target j uniformly among active, excluding i
         if use_bankruptcy
             # pick position in active_idx excluding actor's position
-            apos = findfirst(==(i), active_idx)
-            # apos must exist when active
+            apos = active_pos[i]
             jp = rand(rng, 1:(active_count - 1))
             jp = (jp >= apos) ? (jp + 1) : jp
             j = active_idx[jp]
