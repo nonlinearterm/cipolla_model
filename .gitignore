@@ -1,0 +1,25 @@
+# --- Julia / general ---
+*.log
+.DS_Store
+*.swp
+*.swo
+
+# Notebooks
+.ipynb_checkpoints/
+
+# --- Experiments: keep DNA + summary, ignore heavy results ---
+# Ignore common binary/large result artifacts
+experiments/*/results.*
+experiments/*/*.npz
+experiments/*/*.npy
+experiments/*/*.jld2
+experiments/*/*.arrow
+experiments/*/*.parquet
+experiments/*/*.csv
+experiments/*/*.png
+
+# If you later want to track only config + summary inside experiments, keep these un-ignored:
+!experiments/*/config.yaml
+!experiments/*/summary.json
+
+

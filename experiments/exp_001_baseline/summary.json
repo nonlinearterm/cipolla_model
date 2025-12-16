@@ -1,0 +1,2 @@
+{"metrics":{"var_u":463.1548029612923,"T_steps":10000,"phi_u_lt_threshold":0.44,"u_threshold":-10.0,"N":500,"min_u":-55.39042716363976,"final_mean_u":0.035324792740846246,"final_W":17.662396370423455,"m_W":0.0017662396370423455,"gini_shifted":0.2210877618067273},"meta":{"git_commit":"UNKNOWN","random_seed":12345,"p_types":{"B":0.25,"I":0.25,"S":0.25,"H":0.25},"model_version":"minimal-v1","A":1.0,"sigma":0.1,"model":"minimal_abm_v1","u0":0.0},"status":"OK","timestamp":"2025-12-16T17:16:54Z"}
+

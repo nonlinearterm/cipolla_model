@@ -1,0 +1,27 @@
+model: minimal_abm_v1
+model_version: "minimal-v1"
+git_commit: "UNKNOWN"
+
+N: 500
+T_steps: 10000
+
+# v1 core control parameters
+A: 1.0
+sigma: 0.1
+
+# initial condition
+u0: 0.0
+
+# auxiliary metric threshold (phi = #{u<u_threshold}/N)
+u_threshold: -10.0
+
+# type proportions
+p_types:
+  I: 0.25
+  B: 0.25
+  H: 0.25
+  S: 0.25
+
+random_seed: 12345
+
+

@@ -1,0 +1,33 @@
+model: minimal_abm_v1
+model_version: "minimal-v1"
+git_commit: "UNKNOWN"
+
+N: 500
+T_steps: 10000
+
+# v1 core control parameters
+A: 1.0
+sigma: 0.1
+
+u0: 0.0
+u_threshold: -10.0
+
+# scan parameter
+scan:
+  name: p_S
+  # denser sampling for phase-diagram style plots
+  linspace:
+    start: 0.0
+    stop: 0.5
+    num: 51
+  replicates: 5
+
+# baseline shares for non-scanned types (I,B,H), will be renormalized to (1 - p_S)
+p_types_base:
+  I: 0.33
+  B: 0.33
+  H: 0.34
+
+random_seed: 12345
+
+

@@ -1,0 +1,34 @@
+model: minimal_abm_v1
+model_version: "minimal-v1"
+git_commit: "UNKNOWN"
+
+T_steps: 10000
+
+# v1 core control parameters
+A: 1.0
+sigma: 0.1
+
+u0: 0.0
+u_threshold: -10.0
+
+# fixed type proportions (we scan N, not p_S here)
+p_types:
+  I: 0.25
+  B: 0.25
+  H: 0.25
+  S: 0.25
+
+# scan parameter
+scan:
+  name: N
+  # denser sampling across scales
+  logspace:
+    start: 100
+    stop: 5000
+    num: 17
+  replicates: 5
+
+random_seed: 12345
+
+
+
