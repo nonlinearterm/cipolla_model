@@ -3,6 +3,7 @@ using Random
 struct LeverageSpec
     enabled::Bool
     alpha::Float64
+    gamma::Float64                  # actor sampling weight exponent: P(actor=i) ∝ L_i^gamma
     dist::Symbol
     lmin::Float64
     mu::Float64
@@ -51,9 +52,10 @@ function ModelParams(;
     isfinite(s) || error("p_types sum must be finite, got $s")
     abs(s - 1.0) > 1e-9 && error("p_types must sum to 1.0, got $s")
 
-    lev = leverage === nothing ? LeverageSpec(false, 1.0, :lognormal, 1.0, 0.0, 0.0, Dict{AgentType,Float64}(), :independent) : leverage
+    lev = leverage === nothing ? LeverageSpec(false, 1.0, 0.0, :lognormal, 1.0, 0.0, 0.0, Dict{AgentType,Float64}(), :independent) : leverage
     lev.lmin < 1.0 && error("leverage.lmin must be >= 1.0, got $(lev.lmin)")
     lev.alpha < 0 && error("leverage.alpha must be >= 0, got $(lev.alpha)")
+    lev.gamma < 0 && error("leverage.gamma must be >= 0, got $(lev.gamma)")
     (lev.mode == :independent || lev.mode == :type_biased) || error("leverage.mode must be :independent or :type_biased")
     (lev.dist == :lognormal) || error("leverage.dist must be :lognormal (v2)")
 

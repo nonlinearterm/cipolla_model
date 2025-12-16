@@ -44,6 +44,7 @@ function params_from_config(cfg)::ModelParams
     if lev_cfg !== nothing
         enabled = Bool(get(lev_cfg, "enabled", true))
         alpha = Float64(get(lev_cfg, "alpha", 1.0))
+        gamma = Float64(get(lev_cfg, "gamma", 0.0))
         dist = Symbol(get(lev_cfg, "dist", "lognormal"))
         lmin = Float64(get(lev_cfg, "lmin", 1.0))
         mu = Float64(get(lev_cfg, "mu", 0.0))
@@ -57,7 +58,7 @@ function params_from_config(cfg)::ModelParams
                 tb[parse_agent_type(k)] = Float64(v)
             end
         end
-        leverage = LeverageSpec(enabled, alpha, dist, lmin, mu, sigmaL, tb, mode)
+        leverage = LeverageSpec(enabled, alpha, gamma, dist, lmin, mu, sigmaL, tb, mode)
     end
 
     return ModelParams(

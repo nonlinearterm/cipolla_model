@@ -2,6 +2,7 @@ module CipollaModel
 
 include("types.jl")
 include("params.jl")
+include("alias.jl")
 include("simulate.jl")
 include("measures.jl")
 include("config.jl")

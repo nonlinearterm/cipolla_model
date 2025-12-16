@@ -117,6 +117,7 @@ function run_single(cfg, out_dir::AbstractString; tag=nothing)
         meta["leverage"] = Dict(
             "enabled" => true,
             "alpha" => params.leverage.alpha,
+            "gamma" => params.leverage.gamma,
             "dist" => String(params.leverage.dist),
             "lmin" => params.leverage.lmin,
             "mu" => params.leverage.mu,

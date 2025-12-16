@@ -34,8 +34,18 @@ function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.r
     dist_a = Exponential(params.A)
     dist_eps = Normal(0.0, params.sigma)
 
+    # v3: sample actor i with probability ∝ L_i^gamma (size-biased / power-biased)
+    actor_tab = nothing
+    if params.leverage.enabled && params.leverage.gamma > 0
+        w = Vector{Float64}(undef, N)
+        @inbounds for k in 1:N
+            w[k] = leverages[k]^params.leverage.gamma
+        end
+        actor_tab = AliasTable(w)
+    end
+
     @inbounds for t in 1:T
-        i = rand(rng, 1:N)
+        i = actor_tab === nothing ? rand(rng, 1:N) : sample(rng, actor_tab)
         j = rand(rng, 1:(N - 1))
         j = (j >= i) ? (j + 1) : j  # map to {1..N}\{i}
 
