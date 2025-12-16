@@ -1,0 +1,39 @@
+model: leverage_abm_v2
+model_version: "leverage-v1"
+git_commit: "UNKNOWN"
+
+N: 500
+T_steps: 10000
+
+A: 1.0
+sigma: 0.1
+u0: 0.0
+u_threshold: -10.0
+
+leverage:
+  enabled: true
+  alpha: 1.0
+  dist: lognormal
+  lmin: 1.0
+  mu: 0.0
+  sigma: 0.7
+  mode: independent
+
+# scan parameter
+scan:
+  name: p_S
+  linspace:
+    start: 0.0
+    stop: 0.5
+    num: 51
+  replicates: 5
+
+# baseline shares for non-scanned types (I,B,H), will be renormalized to (1 - p_S)
+p_types_base:
+  I: 0.33
+  B: 0.33
+  H: 0.34
+
+random_seed: 22345
+
+
