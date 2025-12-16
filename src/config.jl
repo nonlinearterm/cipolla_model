@@ -37,6 +37,7 @@ function params_from_config(cfg)::ModelParams
     random_seed = _get_any(cfg, ("random_seed", "seed"), 12345)
     u0 = _get_any(cfg, ("u0",), 0.0)
     u_threshold = _get_any(cfg, ("u_threshold",), -Inf)
+    bankruptcy_threshold = _get_any(cfg, ("bankruptcy_threshold", "bankrupt_threshold"), -Inf)
 
     # v2 leverage (optional; defaults keep v1 behavior)
     lev_cfg = get(cfg, "leverage", nothing)
@@ -70,6 +71,7 @@ function params_from_config(cfg)::ModelParams
         random_seed = random_seed,
         u0 = u0,
         u_threshold = u_threshold,
+        bankruptcy_threshold = bankruptcy_threshold,
         leverage = leverage,
     )
 end

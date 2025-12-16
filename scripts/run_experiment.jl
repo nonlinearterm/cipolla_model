@@ -113,6 +113,10 @@ function run_single(cfg, out_dir::AbstractString; tag=nothing)
         "u0" => params.u0,
     )
 
+    if isfinite(params.bankruptcy_threshold)
+        meta["bankruptcy_threshold"] = params.bankruptcy_threshold
+    end
+
     if params.leverage.enabled
         meta["leverage"] = Dict(
             "enabled" => true,

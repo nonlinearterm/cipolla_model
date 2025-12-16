@@ -54,6 +54,9 @@ function measure_summary(res::SimulationResult; u_threshold::Real=-Inf)
         "gini_shifted" => Float64(gini),
         "phi_u_lt_threshold" => Float64(phi),
         "u_threshold" => thr,
+        "collapsed" => (res.collapse_step > 0),
+        "collapse_step" => res.collapse_step,
+        "active_final" => res.active_final,
         "T_steps" => length(W_series) - 1,
         "N" => N,
     )

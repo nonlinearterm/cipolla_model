@@ -21,6 +21,7 @@ struct ModelParams
     random_seed::Int
     u0::Float64
     u_threshold::Float64
+    bankruptcy_threshold::Float64     # v4: absorbing/bankruptcy cutoff; <= disables when -Inf
     leverage::LeverageSpec
 end
 
@@ -33,6 +34,7 @@ function ModelParams(;
     random_seed::Integer=12345,
     u0::Real=0.0,
     u_threshold::Real=-Inf,
+    bankruptcy_threshold::Real=-Inf,
     leverage = nothing,
 )
     N <= 1 && error("N must be > 1, got $N")
@@ -68,6 +70,7 @@ function ModelParams(;
         Int(random_seed),
         Float64(u0),
         Float64(u_threshold),
+        Float64(bankruptcy_threshold),
         lev,
     )
 end

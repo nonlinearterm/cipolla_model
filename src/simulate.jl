@@ -4,6 +4,8 @@ using Distributions: Exponential, Normal
 struct SimulationResult
     u::Vector{Float64}
     W_series::Vector{Float64}
+    collapse_step::Int      # 0 means no early collapse; otherwise first step where active<2
+    active_final::Int
 end
 
 """
@@ -34,20 +36,75 @@ function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.r
     dist_a = Exponential(params.A)
     dist_eps = Normal(0.0, params.sigma)
 
-    # v3: sample actor i with probability ∝ L_i^gamma (size-biased / power-biased)
-    actor_tab = nothing
-    if params.leverage.enabled && params.leverage.gamma > 0
-        w = Vector{Float64}(undef, N)
-        @inbounds for k in 1:N
-            w[k] = leverages[k]^params.leverage.gamma
+    # v4: absorbing state via bankruptcy_threshold (if finite)
+    use_bankruptcy = isfinite(params.bankruptcy_threshold)
+    active = trues(N)
+    active_idx = collect(1:N)
+    active_count = N
+
+    # v3: actor sampling ∝ L^gamma among ACTIVE agents (rebuild alias when active set changes)
+    function rebuild_actor_tab()
+        if !(params.leverage.enabled && params.leverage.gamma > 0) || active_count == 0
+            return nothing
         end
-        actor_tab = AliasTable(w)
+        w = Vector{Float64}(undef, active_count)
+        @inbounds for p in 1:active_count
+            w[p] = leverages[active_idx[p]]^params.leverage.gamma
+        end
+        return AliasTable(w)
+    end
+    actor_tab = rebuild_actor_tab()
+
+    function deactivate!(k::Int)
+        if !active[k]
+            return false
+        end
+        active[k] = false
+        # remove from active_idx by swap-remove
+        pos = findfirst(==(k), active_idx)
+        if pos !== nothing
+            active_idx[pos] = active_idx[end]
+            pop!(active_idx)
+        end
+        active_count -= 1
+        return true
     end
 
+    collapse_step = 0
+
     @inbounds for t in 1:T
-        i = actor_tab === nothing ? rand(rng, 1:N) : sample(rng, actor_tab)
-        j = rand(rng, 1:(N - 1))
-        j = (j >= i) ? (j + 1) : j  # map to {1..N}\{i}
+        if use_bankruptcy && active_count < 2
+            collapse_step = t
+            # fill remaining series with last W
+            for tt in t:T
+                W_series[tt + 1] = W
+            end
+            break
+        end
+
+        # sample actor i
+        if use_bankruptcy
+            if actor_tab === nothing
+                i = active_idx[rand(rng, 1:active_count)]
+            else
+                i = active_idx[sample(rng, actor_tab)]
+            end
+        else
+            i = actor_tab === nothing ? rand(rng, 1:N) : sample(rng, actor_tab)
+        end
+
+        # sample target j uniformly among active, excluding i
+        if use_bankruptcy
+            # pick position in active_idx excluding actor's position
+            apos = findfirst(==(i), active_idx)
+            # apos must exist when active
+            jp = rand(rng, 1:(active_count - 1))
+            jp = (jp >= apos) ? (jp + 1) : jp
+            j = active_idx[jp]
+        else
+            j = rand(rng, 1:(N - 1))
+            j = (j >= i) ? (j + 1) : j  # map to {1..N}\{i}
+        end
 
         a = rand(rng, dist_a)
         eps_i = rand(rng, dist_eps)
@@ -67,9 +124,22 @@ function simulate(params::ModelParams; rng::AbstractRNG=MersenneTwister(params.r
         u[j] += du_j
         W += du_i + du_j
         W_series[t + 1] = W
+
+        if use_bankruptcy
+            changed = false
+            if u[i] < params.bankruptcy_threshold
+                changed |= deactivate!(i)
+            end
+            if u[j] < params.bankruptcy_threshold
+                changed |= deactivate!(j)
+            end
+            if changed
+                actor_tab = rebuild_actor_tab()
+            end
+        end
     end
 
-    return SimulationResult(u, W_series)
+    return SimulationResult(u, W_series, collapse_step, use_bankruptcy ? active_count : N)
 end
 
 
